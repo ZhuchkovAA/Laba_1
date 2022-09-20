@@ -10,19 +10,22 @@ struct pipe {
 };
 
 struct CS {
-    char _name;
+    string _name;
     int _shopCount;
     int _workShopCount;
     double _efficiency = double(_workShopCount) / double(_shopCount);
 };
 
-int isBool(bool num) {
-    if (num == 1 || num == 0) {
+int isNum(string str) {
+    bool err = false;
+    for (int i = 0; i < str.length(); i++) {
+        /*cout << isdigit(str[i]) << " " << str[i] << "\n";*/
+        if (isdigit(str[i]) != 4)
+            err = true;
+    }
+    if (err)
         return 0;
-    }
-    else {
-        return -1;
-    }
+    return atoi(str.c_str());
 }
 
 pipe yourPipe{};
@@ -36,26 +39,25 @@ void menu() {
 }
 
 void add_pipe() { 
-
+    
+    string length_str;
+    string diameter_str;
+    string inWork_str;
+    
     int length = 0;
     int diameter = 0;
     bool inWork = false;
 
     do {
-        cout << "Введите длину трубы: "; cin >> length;
+        cout << "Введите длину трубы: "; cin >> length_str;
+        length = isNum(length_str);
     } while (length <= 0);
     do {
-        cout << "Введите диаметр трубы: "; cin >> diameter;
+        cout << "Введите диаметр трубы: "; cin >> diameter_str;
+        diameter = isNum(diameter_str);
     } while (diameter <= 0);
-    cout << "В работе(1/0): "; cin >> inWork;
-    
-    if (yourPipe._inWork == 204) {
-        length = 0;
-        diameter = 0;
-        inWork = false;
-        system("cls");
-        menu();
-    }
+    cout << "В работе(1/0): "; cin >> inWork_str;
+    inWork = bool(isNum(inWork_str));
 
     yourPipe = { length, diameter, inWork };
 };
@@ -66,24 +68,20 @@ void out_pipe() {
 
 void red_pipe() {
     if (yourPipe._length != 0 || yourPipe._diameter != 0) {
-        bool inWork;
-        cout << "\nПараметр 'В работе': " << yourPipe._inWork << "\nВведите новое значение: ";
-        cin >> inWork;
         
-        cout << isBool(inWork) << endl << inWork << endl;
-        inWork == false ? yourPipe._inWork = 0 : yourPipe._inWork = 1;
+        string inWork_str;
+        
+        cout << "\nПараметр 'В работе': " << yourPipe._inWork << "\nВведите новое значение: ";
+        cin >> inWork_str;
 
+        yourPipe._inWork = bool(isNum(inWork_str));
+        
+        cout << yourPipe._inWork;
+
+        system("pause");
         system("cls");
+
         cout << "\nДанные успешно изменены!\n";
-        //if (isBool(inWork) == 0) {
-        //    yourPipe._inWork = inWork ;
-        //    system("cls");
-        //    cout << "\nДанные успешно изменены!\n";
-        //}
-        //else {
-        //    system("cls");
-        //    cout << "\nДанные некорректны!\n";
-        //}
     }
     else
     {
@@ -92,22 +90,24 @@ void red_pipe() {
 }
 
 void add_CS() {
+    string nameCS_str;
+    string shopCount_str;
+    string workShopCount_str;
 
-    char nameCS[100];
     int shopCount;
     int workShopCount;
 
-    cout << "Введите название КС: "; cin >> nameCS;
+    cout << "Введите название КС: "; cin >> nameCS_str;
     do {
-        cout << "Введите количество цехов: "; cin >> shopCount;
+        cout << "Введите количество цехов: "; cin >> shopCount_str;
+        shopCount = isNum(shopCount_str);
     } while (shopCount <= 0);
     do {
-        cout << "Введите количество цехов в работе (Max: " << shopCount << "): "; cin >> workShopCount;
+        cout << "Введите количество цехов в работе (Max: " << shopCount << "): "; cin >> workShopCount_str;
+        workShopCount = isNum(workShopCount_str);
     } while (shopCount < workShopCount || workShopCount < 0);
-    
-    cout << nameCS;
 
-    yourCS = { nameCS[0], shopCount, workShopCount };
+    yourCS = { nameCS_str, shopCount, workShopCount };
     
     cout << "Эффективность: " << yourCS._efficiency;
 };
@@ -164,12 +164,12 @@ void in_all_at_file() {
     some_file >> temp;
     cout << temp << endl;
 
-    if (temp == 1) {
-        some_file.getline(temp, 100);
-        yourPipe._length = temp[1];
-        yourPipe._diameter = temp[2];
-        yourPipe._inWork = temp[3];
-    }
+    //if (temp == 1) {
+    //    some_file.getline(temp, 100);
+    //    yourPipe._length = temp[1];
+    //    yourPipe._diameter = temp[2];
+    //    yourPipe._inWork = temp[3];
+    //}
 
     some_file.close();
 
