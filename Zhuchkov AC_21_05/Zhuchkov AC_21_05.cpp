@@ -1,182 +1,184 @@
 #include <iostream>
 #include <fstream>
- 
+
 using namespace std;
- 
+
 struct pipe {
     int _length;
     int _diameter;
     bool _inWork;
 };
- 
+
 struct CS {
-    char _name;
+    string _name;
     int _shopCount;
     int _workShopCount;
     double _efficiency = double(_workShopCount) / double(_shopCount);
 };
- 
-int isBool(bool num) {
-    if (num == 1 || num == 0) {
+
+int isNum(string str) {
+    bool err = false;
+    for (int i = 0; i < str.length(); i++) {
+        /*cout << isdigit(str[i]) << " " << str[i] << "\n";*/
+        if (isdigit(str[i]) != 4) {
+            err = true;
+            break;
+        }
+    }
+    if (err)
         return 0;
-    }
-    else {
-        return -1;
-    }
+    return atoi(str.c_str());
 }
- 
+
 pipe yourPipe{};
 CS yourCS{};
- 
+
 int stateMenu;
 void menu() {
-    setlocale(LC_ALL, "");
-    cout << "1. Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ñ‚Ñ€ÑƒÐ±Ñƒ \n2. Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ ÐšÐ¡ \n3. ÐŸÑ€Ð¾ÑÐ¼Ð¾Ñ‚Ñ€ Ð²ÑÐµÑ… Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð² \n4. Ð ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ñ‚Ñ€ÑƒÐ±Ñƒ \n5. Ð ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ ÐšÐ¡ \n6. Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ \n7. Ð—Ð°Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ \n0. Ð’Ñ‹Ñ…Ð¾Ð´\n\n";
+    cout << "1. Äîáàâèòü òðóáó \n2. Äîáàâèòü ÊÑ \n3. Ïðîñìîòð âñåõ îáúåêòîâ \n4. Ðåäàêòèðîâàòü òðóáó \n5. Ðåäàêòèðîâàòü ÊÑ \n6. Ñîõðàíèòü \n7. Çàãðóçèòü \n0. Âûõîä\n\n";
     cin >> stateMenu;
 }
- 
-void add_pipe() { 
- 
+
+void add_pipe() {
+
+    string length_str;
+    string diameter_str;
+    string inWork_str;
+
     int length = 0;
     int diameter = 0;
     bool inWork = false;
- 
+
     do {
-        cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð´Ð»Ð¸Ð½Ñƒ Ñ‚Ñ€ÑƒÐ±Ñ‹: "; cin >> length;
+        cout << "Ââåäèòå äëèíó òðóáû: "; cin >> length_str;
+        length = isNum(length_str);
     } while (length <= 0);
     do {
-        cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð´Ð¸Ð°Ð¼ÐµÑ‚Ñ€ Ñ‚Ñ€ÑƒÐ±Ñ‹: "; cin >> diameter;
+        cout << "Ââåäèòå äèàìåòð òðóáû: "; cin >> diameter_str;
+        diameter = isNum(diameter_str);
     } while (diameter <= 0);
-    cout << "Ð’ Ñ€Ð°Ð±Ð¾Ñ‚Ðµ(1/0): "; cin >> inWork;
-    
-    if (yourPipe._inWork == 204) {
-        length = 0;
-        diameter = 0;
-        inWork = false;
-        system("cls");
-        menu();
-    }
- 
+    cout << "Â ðàáîòå(1/0): "; cin >> inWork_str;
+    inWork = bool(isNum(inWork_str));
+
     yourPipe = { length, diameter, inWork };
 };
- 
+
 void out_pipe() {
-    cout << "\n\nÐ¢Ñ€ÑƒÐ±Ð°\nÐ”Ð»Ð¸Ð½Ð°: "<< yourPipe._length <<"\nÐ”Ð¸Ð°Ð¼ÐµÑ‚Ñ€: "<< yourPipe._diameter << "\nÐ’ Ñ€Ð°Ð±Ð¾Ñ‚Ðµ: " << yourPipe._inWork << "\n";
+    cout << "\n\nÒðóáà\nÄëèíà: " << yourPipe._length << "\nÄèàìåòð: " << yourPipe._diameter << "\nÂ ðàáîòå: " << yourPipe._inWork << "\n";
 }
- 
+
 void red_pipe() {
     if (yourPipe._length != 0 || yourPipe._diameter != 0) {
-        bool inWork;
-        cout << "\nÐŸÐ°Ñ€Ð°Ð¼ÐµÑ‚Ñ€ 'Ð’ Ñ€Ð°Ð±Ð¾Ñ‚Ðµ': " << yourPipe._inWork << "\nÐ’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð½Ð¾Ð²Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ: ";
-        cin >> inWork;
-        
-        cout << isBool(inWork) << endl << inWork << endl;
-        inWork == false ? yourPipe._inWork = 0 : yourPipe._inWork = 1;
- 
+
+        string inWork_str;
+
+        cout << "\nÏàðàìåòð 'Â ðàáîòå': " << yourPipe._inWork << "\nÂâåäèòå íîâîå çíà÷åíèå: ";
+        cin >> inWork_str;
+
+        yourPipe._inWork = bool(isNum(inWork_str));
+
+        cout << yourPipe._inWork;
+
+        system("pause");
         system("cls");
-        cout << "\nÐ”Ð°Ð½Ð½Ñ‹Ðµ ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ñ‹!\n";
-        //if (isBool(inWork) == 0) {
-        //    yourPipe._inWork = inWork ;
-        //    system("cls");
-        //    cout << "\nÐ”Ð°Ð½Ð½Ñ‹Ðµ ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ñ‹!\n";
-        //}
-        //else {
-        //    system("cls");
-        //    cout << "\nÐ”Ð°Ð½Ð½Ñ‹Ðµ Ð½ÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹!\n";
-        //}
+
+        cout << "\nÄàííûå óñïåøíî èçìåíåíû!\n";
     }
     else
     {
-        cout << "\nÐ”Ð¾Ð±Ð°Ð²ÑŒÑ‚Ðµ Ñ‚Ñ€ÑƒÐ±Ñƒ\n\n";
+        cout << "\nÄîáàâüòå òðóáó\n\n";
     }
 }
- 
+
 void add_CS() {
- 
-    char nameCS[100];
+    string nameCS_str;
+    string shopCount_str;
+    string workShopCount_str;
+
     int shopCount;
     int workShopCount;
- 
-    cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ ÐšÐ¡: "; cin >> nameCS;
+
+    cout << "Ââåäèòå íàçâàíèå ÊÑ: "; cin >> nameCS_str;
     do {
-        cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ†ÐµÑ…Ð¾Ð²: "; cin >> shopCount;
+        cout << "Ââåäèòå êîëè÷åñòâî öåõîâ: "; cin >> shopCount_str;
+        shopCount = isNum(shopCount_str);
     } while (shopCount <= 0);
     do {
-        cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ†ÐµÑ…Ð¾Ð² Ð² Ñ€Ð°Ð±Ð¾Ñ‚Ðµ (Max: " << shopCount << "): "; cin >> workShopCount;
+        cout << "Ââåäèòå êîëè÷åñòâî öåõîâ â ðàáîòå (Max: " << shopCount << "): "; cin >> workShopCount_str;
+        workShopCount = isNum(workShopCount_str);
     } while (shopCount < workShopCount || workShopCount < 0);
-    
-    cout << nameCS;
- 
-    yourCS = { nameCS[0], shopCount, workShopCount };
-    
-    cout << "Ð­Ñ„Ñ„ÐµÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚ÑŒ: " << yourCS._efficiency;
+
+    yourCS = { nameCS_str, shopCount, workShopCount };
+
+    cout << "Ýôôåêòèâíîñòü: " << yourCS._efficiency;
 };
- 
+
 void out_CS() {
-    cout << "\n\nKC\nÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ: " << yourCS._name << "\nÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ†ÐµÑ…Ð¾Ð²: " << yourCS._shopCount << "\nÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ†ÐµÑ…Ð¾Ð² Ð² Ñ€Ð°Ð±Ð¾Ñ‚Ðµ: " << yourCS._workShopCount << "\nÐ­Ñ„Ñ„ÐµÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚ÑŒ: " << yourCS._efficiency << "\n";
+    cout << "\n\nKC\nÍàçâàíèå: " << yourCS._name << "\nÊîëè÷åñòâî öåõîâ: " << yourCS._shopCount << "\nÊîëè÷åñòâî öåõîâ â ðàáîòå: " << yourCS._workShopCount << "\nÝôôåêòèâíîñòü: " << yourCS._efficiency << "\n";
 }
- 
+
 void red_CS() {
     if (yourCS._shopCount != 0 || yourCS._workShopCount != 0) {
-        
+
         int workShopCount;
-        
-        cout << "\nÐŸÐ°Ñ€Ð°Ð¼ÐµÑ‚Ñ€ 'ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ†ÐµÑ…Ð¾Ð² Ð² Ñ€Ð°Ð±Ð¾Ñ‚Ðµ': " << yourCS._workShopCount;
- 
+
+        cout << "\nÏàðàìåòð 'Êîëè÷åñòâî öåõîâ â ðàáîòå': " << yourCS._workShopCount;
+
         do {
-            cout << "\nÐ’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð½Ð¾Ð²Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ(Max: " << yourCS._shopCount << "): ";  cin >> workShopCount;
+            cout << "\nÂâåäèòå íîâîå çíà÷åíèå(Max: " << yourCS._shopCount << "): ";  cin >> workShopCount;
         } while (yourCS._shopCount < workShopCount || workShopCount < 0);
-        
-        
+
+
         yourCS._workShopCount = workShopCount;
         system("cls");
-        cout << "\nÐ”Ð°Ð½Ð½Ñ‹Ðµ ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ñ‹!\n";
+        cout << "\nÄàííûå óñïåøíî èçìåíåíû!\n";
     }
     else
     {
-        cout << "\nÐ”Ð¾Ð±Ð°Ð²ÑŒÑ‚Ðµ KC\n\n";
+        cout << "\nÄîáàâüòå KC\n\n";
     }
 }
- 
+
 void out_all_to_file() {
     ofstream fout("out.txt");
     if (!(yourPipe._length == 0 && yourPipe._diameter == 0 && yourPipe._inWork == 0)) {
-        fout << "Ð¢Ñ€ÑƒÐ±Ð°\nÐ”Ð»Ð¸Ð½Ð°: " << yourPipe._length << "\nÐ”Ð¸Ð°Ð¼ÐµÑ‚Ñ€: " << yourPipe._diameter << "\nÐ’ Ñ€Ð°Ð±Ð¾Ñ‚Ðµ: " << yourPipe._inWork << "\n\n\n";
+        fout << "Òðóáà\nÄëèíà: " << yourPipe._length << "\nÄèàìåòð: " << yourPipe._diameter << "\nÂ ðàáîòå: " << yourPipe._inWork << "\n\n\n";
     }
     else
     {
-        fout << "Ð¢Ñ€ÑƒÐ±Ñ‹ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾!\n";
+        fout << "Òðóáû íå íàéäåíî!\n";
     }
     if (!(yourCS._shopCount == 0 && yourCS._workShopCount == 0)) {
-        fout << "KC\nÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ: " << yourCS._name << "\nÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ†ÐµÑ…Ð¾Ð²: " << yourCS._shopCount << "\nÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ†ÐµÑ…Ð¾Ð² Ð² Ñ€Ð°Ð±Ð¾Ñ‚Ðµ: " << yourCS._workShopCount << "\nÐ­Ñ„Ñ„ÐµÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚ÑŒ: " << yourCS._efficiency << "\n";
+        fout << "KC\nÍàçâàíèå: " << yourCS._name << "\nÊîëè÷åñòâî öåõîâ: " << yourCS._shopCount << "\nÊîëè÷åñòâî öåõîâ â ðàáîòå: " << yourCS._workShopCount << "\nÝôôåêòèâíîñòü: " << yourCS._efficiency << "\n";
     }
     else
     {
-        fout << "KC Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾!\n";
+        fout << "KC íå íàéäåíî!\n";
     }
     fout.close();
 }
- 
+
 void in_all_at_file() {
     char temp[100];
     ifstream some_file("in.txt");
- 
+
     some_file >> temp;
     cout << temp << endl;
- 
-    if (temp == 1) {
-        some_file.getline(temp, 100);
-        yourPipe._length = temp[1];
-        yourPipe._diameter = temp[2];
-        yourPipe._inWork = temp[3];
-    }
- 
+
+    //if (temp == 1) {
+    //    some_file.getline(temp, 100);
+    //    yourPipe._length = temp[1];
+    //    yourPipe._diameter = temp[2];
+    //    yourPipe._inWork = temp[3];
+    //}
+
     some_file.close();
- 
+
     cin.get();
 }
 int main()
 {
+    setlocale(LC_ALL, "");
     menu();
     while (stateMenu != 0)
     {
@@ -206,14 +208,14 @@ int main()
             system("cls");
             menu();
             break;
- 
+
         case 4:
             red_pipe();
             system("pause");
             system("cls");
             menu();
             break;
- 
+
         case 5:
             red_CS();
             system("pause");
