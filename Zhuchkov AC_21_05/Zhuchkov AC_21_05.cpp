@@ -10,22 +10,19 @@ struct pipe {
 };
 
 struct CS {
-    string _name;
+    char _name;
     int _shopCount;
     int _workShopCount;
     double _efficiency = double(_workShopCount) / double(_shopCount);
 };
 
-int isNum(string str) {
-    bool err = false;
-    for (int i = 0; i < str.length(); i++) {
-        /*cout << isdigit(str[i]) << " " << str[i] << "\n";*/
-        if (isdigit(str[i]) != 4)
-            err = true;
-    }
-    if (err)
+int isBool(bool num) {
+    if (num == 1 || num == 0) {
         return 0;
-    return atoi(str.c_str());
+    }
+    else {
+        return -1;
+    }
 }
 
 pipe yourPipe{};
@@ -39,25 +36,26 @@ void menu() {
 }
 
 void add_pipe() { 
-    
-    string length_str;
-    string diameter_str;
-    string inWork_str;
-    
+
     int length = 0;
     int diameter = 0;
     bool inWork = false;
 
     do {
-        cout << "Введите длину трубы: "; cin >> length_str;
-        length = isNum(length_str);
+        cout << "Введите длину трубы: "; cin >> length;
     } while (length <= 0);
     do {
-        cout << "Введите диаметр трубы: "; cin >> diameter_str;
-        diameter = isNum(diameter_str);
+        cout << "Введите диаметр трубы: "; cin >> diameter;
     } while (diameter <= 0);
-    cout << "В работе(1/0): "; cin >> inWork_str;
-    inWork = bool(isNum(inWork_str));
+    cout << "В работе(1/0): "; cin >> inWork;
+    
+    if (yourPipe._inWork == 204) {
+        length = 0;
+        diameter = 0;
+        inWork = false;
+        system("cls");
+        menu();
+    }
 
     yourPipe = { length, diameter, inWork };
 };
@@ -68,20 +66,24 @@ void out_pipe() {
 
 void red_pipe() {
     if (yourPipe._length != 0 || yourPipe._diameter != 0) {
-        
-        string inWork_str;
-        
+        bool inWork;
         cout << "\nПараметр 'В работе': " << yourPipe._inWork << "\nВведите новое значение: ";
-        cin >> inWork_str;
-
-        yourPipe._inWork = bool(isNum(inWork_str));
+        cin >> inWork;
         
-        cout << yourPipe._inWork;
+        cout << isBool(inWork) << endl << inWork << endl;
+        inWork == false ? yourPipe._inWork = 0 : yourPipe._inWork = 1;
 
-        system("pause");
         system("cls");
-
         cout << "\nДанные успешно изменены!\n";
+        //if (isBool(inWork) == 0) {
+        //    yourPipe._inWork = inWork ;
+        //    system("cls");
+        //    cout << "\nДанные успешно изменены!\n";
+        //}
+        //else {
+        //    system("cls");
+        //    cout << "\nДанные некорректны!\n";
+        //}
     }
     else
     {
@@ -90,24 +92,22 @@ void red_pipe() {
 }
 
 void add_CS() {
-    string nameCS_str;
-    string shopCount_str;
-    string workShopCount_str;
 
+    char nameCS[100];
     int shopCount;
     int workShopCount;
 
-    cout << "Введите название КС: "; cin >> nameCS_str;
+    cout << "Введите название КС: "; cin >> nameCS;
     do {
-        cout << "Введите количество цехов: "; cin >> shopCount_str;
-        shopCount = isNum(shopCount_str);
+        cout << "Введите количество цехов: "; cin >> shopCount;
     } while (shopCount <= 0);
     do {
-        cout << "Введите количество цехов в работе (Max: " << shopCount << "): "; cin >> workShopCount_str;
-        workShopCount = isNum(workShopCount_str);
+        cout << "Введите количество цехов в работе (Max: " << shopCount << "): "; cin >> workShopCount;
     } while (shopCount < workShopCount || workShopCount < 0);
+    
+    cout << nameCS;
 
-    yourCS = { nameCS_str, shopCount, workShopCount };
+    yourCS = { nameCS[0], shopCount, workShopCount };
     
     cout << "Эффективность: " << yourCS._efficiency;
 };
@@ -164,12 +164,12 @@ void in_all_at_file() {
     some_file >> temp;
     cout << temp << endl;
 
-    //if (temp == 1) {
-    //    some_file.getline(temp, 100);
-    //    yourPipe._length = temp[1];
-    //    yourPipe._diameter = temp[2];
-    //    yourPipe._inWork = temp[3];
-    //}
+    if (temp == 1) {
+        some_file.getline(temp, 100);
+        yourPipe._length = temp[1];
+        yourPipe._diameter = temp[2];
+        yourPipe._inWork = temp[3];
+    }
 
     some_file.close();
 
