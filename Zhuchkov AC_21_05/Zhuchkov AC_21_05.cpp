@@ -20,7 +20,7 @@ int isNum(string str) {
     bool err = false;
     for (int i = 0; i < str.length(); i++) {
         /*cout << isdigit(str[i]) << " " << str[i] << "\n";*/
-        if (isdigit(str[i]) != 4) {
+        if (isdigit(str[i]) != 4 || str[i] == ' ') {
             err = true;
             break;
         }
@@ -35,8 +35,10 @@ CS yourCS{};
 
 int stateMenu;
 void menu() {
+    string stateMenu_str;
     cout << "1. Добавить трубу \n2. Добавить КС \n3. Просмотр всех объектов \n4. Редактировать трубу \n5. Редактировать КС \n6. Сохранить \n7. Загрузить \n0. Выход\n\n";
-    cin >> stateMenu;
+    cin >> stateMenu_str;
+    stateMenu = isNum(stateMenu_str);
 }
 
 void add_pipe() {
@@ -159,23 +161,39 @@ void out_all_to_file() {
 }
 
 void in_all_at_file() {
-    char temp[100];
-    ifstream some_file("in.txt");
+    ifstream fin("in.txt");
 
-    some_file >> temp;
-    cout << temp << endl;
+    string length_str;
+    string diameter_str;
+    string inWork_str;
 
-    //if (temp == 1) {
-    //    some_file.getline(temp, 100);
-    //    yourPipe._length = temp[1];
-    //    yourPipe._diameter = temp[2];
-    //    yourPipe._inWork = temp[3];
-    //}
+    string nameCS_str;
+    string shopCount_str;
+    string workShopCount_str;
 
-    some_file.close();
+    fin >> length_str >> diameter_str >> inWork_str >> nameCS_str >> shopCount_str >> workShopCount_str;
 
-    cin.get();
+    yourPipe._length = isNum(length_str);
+    yourPipe._diameter = isNum(diameter_str);
+    yourPipe._inWork = isNum(inWork_str);
+
+    if (isNum(length_str) <= 0 || isNum(diameter_str) <= 0) {
+        yourPipe = { 0, 0, 0 };
+    }
+
+    yourCS._name = nameCS_str;
+    yourCS._shopCount = isNum(shopCount_str);
+    yourCS._workShopCount = isNum(workShopCount_str);
+    yourCS._efficiency = double(yourCS._workShopCount) / double(yourCS._shopCount);
+
+    if (isNum(shopCount_str) <= 0 || isNum(workShopCount_str) <= 0 || isNum(workShopCount_str) > isNum(shopCount_str)) {
+        yourCS = { "", 0, 0, 0};
+    }
+    
+    out_pipe();
+    out_CS();
 }
+
 int main()
 {
     setlocale(LC_ALL, "");
@@ -234,6 +252,9 @@ int main()
             system("cls");
             menu();
             break;
+        default:
+            system("cls");
+            menu();
         }
     }
 }
