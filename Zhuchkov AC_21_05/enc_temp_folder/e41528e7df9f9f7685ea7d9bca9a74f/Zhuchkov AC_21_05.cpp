@@ -280,7 +280,7 @@ void in_all_at_file() {
             }
             else out_CS();
         }
-        else cout << "\nKC не найдена!\n";
+        else cout << "KC не найдена!\n";
     }
     else cout << "Файл не удалось открыть\nСоздайте data.txt\n";
 }
