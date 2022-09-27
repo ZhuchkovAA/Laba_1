@@ -119,12 +119,18 @@ void add_CS() {
     int workShopCount;
 
     cout << "Введите название КС: "; cin >> nameCS_str;
+    cin.clear();
+    cin.ignore(INT_MAX, '\n');
     do {
         cout << "Введите количество цехов: "; cin >> shopCount_str;
+        cin.clear();
+        cin.ignore(INT_MAX, '\n');
         shopCount = isNum(shopCount_str);
     } while (shopCount <= 0);
     do {
         cout << "Введите количество цехов в работе (Max: " << shopCount << "): "; cin >> workShopCount_str;
+        cin.clear();
+        cin.ignore(INT_MAX, '\n');
         workShopCount = isNum(workShopCount_str);
     } while (shopCount < workShopCount || workShopCount < 0);
 
@@ -154,6 +160,7 @@ void red_CS() {
         yourCS._workShopCount = workShopCount;
         system("cls");
         cout << "\nДанные успешно изменены!\n";
+        yourCS._efficiency = double(yourCS._workShopCount) / double(yourCS._shopCount);
     }
     else
     {
