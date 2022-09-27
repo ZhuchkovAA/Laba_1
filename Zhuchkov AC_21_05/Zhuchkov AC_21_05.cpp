@@ -20,7 +20,7 @@ int isNum(string str) {
     bool err = false;
     for (int i = 0; i < str.length(); i++) {
         /*cout << isdigit(str[i]) << " " << str[i] << "\n";*/
-        if (isdigit(str[i]) != 4 || str[i] == ' ') {
+        if (isdigit(str[i]) == 0 || str[i] == ' ') {
             err = true;
             break;
         }
@@ -38,7 +38,16 @@ void menu() {
     string stateMenu_str;
     cout << "1. Добавить трубу \n2. Добавить КС \n3. Просмотр всех объектов \n4. Редактировать трубу \n5. Редактировать КС \n6. Сохранить \n7. Загрузить \n0. Выход\n\n";
     cin >> stateMenu_str;
-    stateMenu = isNum(stateMenu_str);
+    
+    bool err = false;
+    for (int i = 0; i < stateMenu_str.size(); i++) {
+        if (isdigit(stateMenu_str[i]) == 0) {
+            err = true;
+            break;
+        }
+    }
+
+    err ? stateMenu = -1 : stateMenu = isNum(stateMenu_str);
 }
 
 void add_pipe() {
@@ -78,8 +87,6 @@ void red_pipe() {
         cin >> inWork_str;
 
         yourPipe._inWork = bool(isNum(inWork_str));
-
-        cout << yourPipe._inWork;
 
         system("pause");
         system("cls");
@@ -255,6 +262,7 @@ int main()
         default:
             system("cls");
             menu();
+            break;
         }
     }
 }
