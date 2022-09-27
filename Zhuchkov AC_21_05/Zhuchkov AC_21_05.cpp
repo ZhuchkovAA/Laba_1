@@ -39,6 +39,9 @@ void menu() {
     cout << "1. Добавить трубу \n2. Добавить КС \n3. Просмотр всех объектов \n4. Редактировать трубу \n5. Редактировать КС \n6. Сохранить \n7. Загрузить \n0. Выход\n\n";
     cin >> stateMenu_str;
     
+    cin.clear();
+    cin.ignore(INT_MAX, '\n');
+    
     bool err = false;
     for (int i = 0; i < stateMenu_str.size(); i++) {
         if (isdigit(stateMenu_str[i]) == 0) {
@@ -62,13 +65,19 @@ void add_pipe() {
 
     do {
         cout << "Введите длину трубы: "; cin >> length_str;
+        cin.clear();
+        cin.ignore(INT_MAX, '\n');
         length = isNum(length_str);
     } while (length <= 0);
     do {
         cout << "Введите диаметр трубы: "; cin >> diameter_str;
+        cin.clear();
+        cin.ignore(INT_MAX, '\n'); 
         diameter = isNum(diameter_str);
     } while (diameter <= 0);
     cout << "В работе(1/0): "; cin >> inWork_str;
+    cin.clear();
+    cin.ignore(INT_MAX, '\n');
     inWork = bool(isNum(inWork_str));
 
     yourPipe = { length, diameter, inWork };
@@ -85,6 +94,8 @@ void red_pipe() {
 
         cout << "\nПараметр 'В работе': " << yourPipe._inWork << "\nВведите новое значение: ";
         cin >> inWork_str;
+        cin.clear();
+        cin.ignore(INT_MAX, '\n');
 
         yourPipe._inWork = bool(isNum(inWork_str));
 
@@ -135,6 +146,8 @@ void red_CS() {
 
         do {
             cout << "\nВведите новое значение(Max: " << yourCS._shopCount << "): ";  cin >> workShopCount;
+            cin.clear();
+            cin.ignore(INT_MAX, '\n');
         } while (yourCS._shopCount < workShopCount || workShopCount < 0);
 
 
