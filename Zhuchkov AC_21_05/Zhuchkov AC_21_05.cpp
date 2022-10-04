@@ -17,7 +17,7 @@ struct CS {
     double _efficiency = double(_workShopCount) / double(_shopCount);
 };
 
-int isInt(string str) {
+bool isInt(string str) {
     bool err = false;
     for (int i = 0; i < str.length(); i++) {
         /*cout << isdigit(str[i]) << " " << str[i] << "\n";*/
@@ -28,53 +28,57 @@ int isInt(string str) {
     }
     if (err)
         return 0;
-    return atoi(str.c_str());
+    return 1;
 }
 
-float isFloat(string str) {
+int toInt(string str) {
+    if (isInt(str)) return atoi(str.c_str());
+    else return 0;
+}
+
+bool isFloat(string str) {
     bool err = false;
     for (int i = 0; i < str.length(); i++) {
         if (str[i] == '.') str[i] = ',';
         /*cout << str[i] << " " << (isdigit(str[i]) == 0) << " " << (str[i] != ',') << " " << ((isdigit(str[i]) == 0) && (str[i] != ',')) << endl;*/
-        if ((isdigit(str[i]) == 0) && (str[i] != ',')) { 
-                err = true;
-                break;
-            }
-    }
-    if (err)
-        return 0;
-    return atof(str.c_str());
-}
-
-int isBool(string str) {
-    if (str == "0" || str == "1") return 0;
-    else return -1;
-}
-
-pipe yourPipe{};
-CS yourCS{};
-
-int stateMenu;
-void menu() {
-    string stateMenu_str;
-    cout << "1. Добавить трубу \n2. Добавить КС \n3. Просмотр всех объектов \n4. Редактировать трубу \n5. Редактировать КС \n6. Сохранить \n7. Загрузить \n0. Выход\n\n";
-    cin >> stateMenu_str;
-    
-    cin.clear();
-    cin.ignore(INT_MAX, '\n');
-    
-    bool err = false;
-    for (int i = 0; i < stateMenu_str.size(); i++) {
-        if (isdigit(stateMenu_str[i]) == 0) {
+        if ((isdigit(str[i]) == 0) && (str[i] != ',')) {
             err = true;
             break;
         }
     }
-
-    err ? stateMenu = -1 : stateMenu = isInt(stateMenu_str);
+    if (err)
+        return 0;
+    return 1;
 }
 
-void add_pipe() {
+float toFloat(string str) {
+    if (isFloat(str)) return atof(str.c_str());
+    else return 0;
+}
+
+bool isBool(string str) {
+    if (str == "0" || str == "1") return 1;
+    else return 0;
+}
+
+void menu() {
+    system("pause");
+    system("cls");
+    cout << "1. Добавить трубу \n2. Добавить КС \n3. Просмотр всех объектов \n4. Редактировать трубу \n5. Редактировать КС \n6. Сохранить \n7. Загрузить \n0. Выход\n\n";
+}
+
+void add_stateMenu(int& stateMenu) {
+    string stateMenu_str;
+
+cin >> stateMenu_str;
+
+    cin.clear();
+    cin.ignore(INT_MAX, '\n');
+    
+    isInt(stateMenu_str) ? stateMenu = toInt(stateMenu_str) : stateMenu = -1;
+}
+
+void add_pipe(pipe& yourPipe) {
 
     string length_str;
     string diameter_str;
@@ -88,28 +92,28 @@ void add_pipe() {
         cout << "Введите длину трубы: "; cin >> length_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
-        length = isFloat(length_str);
+        length = toFloat(length_str);
     } while (length <= 0);
     do {
         cout << "Введите диаметр трубы: "; cin >> diameter_str;
         cin.clear();
-        cin.ignore(INT_MAX, '\n'); 
-        diameter = isFloat(diameter_str);
+        cin.ignore(INT_MAX, '\n');
+        diameter = toFloat(diameter_str);
     } while (diameter <= 0);
     do {
         cout << "В работе(1/0): "; cin >> inWork_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
-        if (isBool(inWork_str) == 0) inWork = isInt(inWork_str);
-    } while (isBool(inWork_str) == -1);
+        if (isBool(inWork_str) == 1) inWork = toInt(inWork_str);
+    } while (isBool(inWork_str) == 0);
     yourPipe = { length, diameter, inWork };
 };
 
-void out_pipe() {
+void out_pipe(pipe yourPipe) {
     cout << "\n\nТруба\nДлина: " << yourPipe._length << "\nДиаметр: " << yourPipe._diameter << "\nВ работе: " << yourPipe._inWork << "\n";
 }
 
-void red_pipe() {
+void edit_pipe(pipe& yourPipe) {
     if (yourPipe._length != 0 || yourPipe._diameter != 0) {
 
         string inWork_str;
@@ -120,8 +124,8 @@ void red_pipe() {
             cin >> inWork_str;
             cin.clear();
             cin.ignore(INT_MAX, '\n');
-            if (isBool(inWork_str) == 0) yourPipe._inWork = bool(isInt(inWork_str));
-        } while (isBool(inWork_str) == -1);
+            if (isBool(inWork_str) == 1) yourPipe._inWork = bool(toInt(inWork_str));
+        } while (isBool(inWork_str) == 0);
         system("pause");
         system("cls");
 
@@ -133,7 +137,7 @@ void red_pipe() {
     }
 }
 
-void add_CS() {
+void add_CS(CS& yourCS) {
     string nameCS_str;
     string shopCount_str;
     string workShopCount_str;
@@ -141,19 +145,19 @@ void add_CS() {
     int shopCount;
     int workShopCount;
 
-    cout << "Введите название КС: "; 
+    cout << "Введите название КС: ";
     getline(cin, nameCS_str, '\n');
     do {
         cout << "Введите количество цехов: "; cin >> shopCount_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
-        shopCount = isInt(shopCount_str);
+        shopCount = toInt(shopCount_str);
     } while (shopCount <= 0);
     do {
         cout << "Введите количество цехов в работе (Max: " << shopCount << "): "; cin >> workShopCount_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
-        workShopCount = isInt(workShopCount_str);
+        workShopCount = toInt(workShopCount_str);
     } while (shopCount < workShopCount || workShopCount < 0);
 
     yourCS = { nameCS_str, shopCount, workShopCount };
@@ -161,11 +165,11 @@ void add_CS() {
     cout << "Эффективность: " << yourCS._efficiency;
 };
 
-void out_CS() {
+void out_CS(CS yourCS) {
     cout << "\n\nKC\nНазвание: " << yourCS._name << "\nКоличество цехов: " << yourCS._shopCount << "\nКоличество цехов в работе: " << yourCS._workShopCount << "\nЭффективность: " << yourCS._efficiency << "\n";
 }
 
-void red_CS() {
+void edit_CS(CS& yourCS) {
     if (yourCS._shopCount != 0 || yourCS._workShopCount != 0) {
 
         int workShopCount;
@@ -178,7 +182,6 @@ void red_CS() {
             cin.ignore(INT_MAX, '\n');
         } while (yourCS._shopCount < workShopCount || workShopCount < 0);
 
-
         yourCS._workShopCount = workShopCount;
         system("cls");
         cout << "\nДанные успешно изменены!\n";
@@ -190,21 +193,7 @@ void red_CS() {
     }
 }
 
-//int count_str() {
-//    ifstream fin("data.txt");
-//
-//    string line;
-//    int count = 0;
-//
-//    while (getline(fin, line))
-//    {
-//        count+=1;
-//    }
-//
-//    return count;
-//}
-
-void out_all_to_file() {
+void out_all_to_file(pipe yourPipe, CS yourCS) {
     ofstream fout("data.txt");
     if (!(yourPipe._length == 0 && yourPipe._diameter == 0 && yourPipe._inWork == 0)) {
         fout << "Труба\n" << yourPipe._length << "\n" << yourPipe._diameter << "\n" << yourPipe._inWork << "\n";
@@ -223,38 +212,37 @@ void out_all_to_file() {
     fout.close();
 }
 
-void in_all_at_file() {
+void in_all_at_file(pipe& yourPipe, CS& yourCS) {
     ifstream fin("data.txt");
-    
 
     if (fin.is_open()) {
-        
+
         string str;
 
         getline(fin, str, '\n');
         if (str == "Труба") {
 
             getline(fin, str, '\n');
-            yourPipe._length = isFloat(str);
+            yourPipe._length = toFloat(str);
 
             getline(fin, str, '\n');
-            yourPipe._diameter = isFloat(str);
+            yourPipe._diameter = toFloat(str);
 
             getline(fin, str, '\n');
 
-            if (isBool(str) == -1) {
+            if (isBool(str) == 0) {
                 yourPipe = { 0, 0, 0 };
                 cout << "Ошибка Трубы\n";
             }
             else {
-                yourPipe._inWork = isInt(str);
+                yourPipe._inWork = toInt(str);
             }
-            
+
             if (yourPipe._length <= 0 || yourPipe._diameter <= 0) {
                 yourPipe = { 0, 0, 0 };
                 cout << "Ошибка Трубы\n";
             }
-            else out_pipe();
+            else out_pipe(yourPipe);
 
         }
         else cout << "Труба не найдена!\n";
@@ -262,15 +250,15 @@ void in_all_at_file() {
         getline(fin, str, '\n');
         getline(fin, str, '\n');
         if (str == "KC") {
-            
+
             getline(fin, str, '\n');
             yourCS._name = str;
 
             getline(fin, str, '\n');
-            yourCS._shopCount = isInt(str);
+            yourCS._shopCount = toInt(str);
 
             getline(fin, str, '\n');
-            yourCS._workShopCount = isInt(str);
+            yourCS._workShopCount = toInt(str);
 
             yourCS._efficiency = double(yourCS._workShopCount) / double(yourCS._shopCount);
 
@@ -278,73 +266,62 @@ void in_all_at_file() {
                 yourCS = { "", 0, 0, 0 };
                 cout << "Ошибка КС\n";
             }
-            else out_CS();
+            else out_CS(yourCS);
         }
         else cout << "\nKC не найдена!\n";
+        fin.close();
     }
     else cout << "Файл не удалось открыть\nСоздайте data.txt\n";
 }
 
 int main()
 {
+    pipe yourPipe{};
+    CS yourCS{};
+
+    int stateMenu = -1;
     setlocale(LC_ALL, "");
     menu();
-    while (stateMenu != 0)
+    while (stateMenu)
     {
+        add_stateMenu(stateMenu);
         switch (stateMenu) {
         case 1:
-            add_pipe();
-            out_pipe();
-            system("pause");
-            system("cls");
+            add_pipe(yourPipe);
+            out_pipe(yourPipe);
             menu();
             break;
         case 2:
-            add_CS();
-            out_CS();
-            system("pause");
-            system("cls");
+            add_CS(yourCS);
+            out_CS(yourCS);
             menu();
             break;
         case 3:
             if (!(yourPipe._length == 0 && yourPipe._diameter == 0 && yourPipe._inWork == 0)) {
-                out_pipe();
+                out_pipe(yourPipe);
             }
             if (!(yourCS._shopCount == 0 && yourCS._workShopCount == 0)) {
-                out_CS();
+                out_CS(yourCS);
             }
-            system("pause");
-            system("cls");
             menu();
             break;
-
         case 4:
-            red_pipe();
-            system("pause");
-            system("cls");
+            edit_pipe(yourPipe);
             menu();
             break;
-
         case 5:
-            red_CS();
-            system("pause");
-            system("cls");
+            edit_CS(yourCS);
             menu();
             break;
         case 6:
-            out_all_to_file();
-            system("pause");
-            system("cls");
+            out_all_to_file(yourPipe, yourCS);
             menu();
             break;
         case 7:
-            in_all_at_file();
-            system("pause");
-            system("cls");
+            in_all_at_file(yourPipe, yourCS);
             menu();
             break;
         default:
-            system("cls");
             menu();
             break;
         }
