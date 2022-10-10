@@ -141,6 +141,9 @@
   <ItemGroup>
     <ClCompile Include="Zhuchkov AC_21_05.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Zhuchkov AC_21_05.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
