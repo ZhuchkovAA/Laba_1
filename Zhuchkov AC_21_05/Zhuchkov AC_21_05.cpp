@@ -2,7 +2,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include "Zhuchkov AC_21_05.h"
 
 using namespace std;
 
@@ -38,7 +37,7 @@ bool isInt(string str) {
 
 int toInt(string str) {
     if (isInt(str)) return atoi(str.c_str());
-    else return 0;
+    return 0;
 }
 
 bool isFloat(string str) {
@@ -64,18 +63,23 @@ bool isFloat(string str) {
 
 float toFloat(string str) {
     if (isFloat(str)) return atof(str.c_str());
-    else return 0;
+    return 0;
 }
 
 bool isBool(string str) {
     if (str == "0" || str == "1") return 1;
-    else return 0;
+    return 0;
+}
+
+bool toBool(string str) {
+    if (isBool(str)) return atoi(str.c_str());
+    return 0;
 }
 
 void menu() {
     system("pause");
     system("cls");
-    cout << "1. Добавить трубу \n2. Добавить КС \n3. Просмотр всех объектов \n4. Редактировать трубу \n5. Редактировать КС \n6. Сохранить \n7. Загрузить \n8. Поиск объектов по заданному фильтру(Труба) \n9. Поиск объектов по заданному фильтру(КС) \n10. Удалить Трубу\n11. Удалить КС \n12. Пакетное редактирование труб\n0. Выход\n\n";
+    cout << "1. Добавить трубу \n2. Добавить КС \n3. Просмотр всех объектов \n4. Редактировать трубу \n5. Редактировать КС \n6. Сохранить \n7. Загрузить \n8. Поиск объектов по заданному фильтру(Труба) \n9. Поиск объектов по заданному фильтру(КС) \n10. Удалить Трубу\n11. Удалить КС\n0. Выход\n\n";
 }
 
 void add_stateMenu(int& stateMenu) {
@@ -85,7 +89,7 @@ void add_stateMenu(int& stateMenu) {
 
     cin.clear();
     cin.ignore(INT_MAX, '\n');
-    
+
     isInt(stateMenu_str) ? stateMenu = toInt(stateMenu_str) : stateMenu = -1;
 }
 
@@ -104,13 +108,11 @@ int count_not_null_CS(vector<CS> yourCSs) {
 }
 
 int new_idPipe(vector<pipe> yourPipes) {
-    if (yourPipes.size() == 0) return 0;
-    else return yourPipes[yourPipes.size() - 1]._idPipe + 1;
+    return yourPipes.size();
 }
 
 int new_idCS(vector<CS> yourCSs) {
-    if (yourCSs.size() == 0) return 0;
-    else return yourCSs[yourCSs.size() - 1]._idCS + 1;
+    return yourCSs.size();
 }
 
 bool is_there_idPipe(vector<pipe> yourPipes, int id) {
@@ -125,7 +127,7 @@ bool is_there_idCS(vector<CS> yourCSs, int id) {
     return false;
 }
 
-void add_pipe(vector<pipe>& yourPipes , int& id) {
+void add_pipe(vector<pipe>& yourPipes) {
 
     string length_str;
     string diameter_str;
@@ -140,27 +142,27 @@ void add_pipe(vector<pipe>& yourPipes , int& id) {
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         length = toFloat(length_str);
-    } while (length <= 0);
+    } while (length == 0);
     do {
         cout << "Введите диаметр трубы: "; cin >> diameter_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         diameter = toFloat(diameter_str);
-    } while (diameter <= 0);
+    } while (diameter == 0);
     do {
         cout << "В работе(1/0): "; cin >> inWork_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
-        if (isBool(inWork_str) == 1) inWork = toInt(inWork_str);
-    } while (isBool(inWork_str) == 0);
-    
-    yourPipes.push_back({new_idPipe(yourPipes), length, diameter, inWork });
+        inWork = toBool(inWork_str);
+    } while (!(isBool(inWork_str)));
+
+    yourPipes.push_back({ new_idPipe(yourPipes), length, diameter, inWork });
 };
 
 void out_pipe(vector<pipe> yourPipes) {
     for (int i = 0; i < yourPipes.size(); i++)
         if (yourPipes[i]._length != 0)
-            cout << "\n\nТруба\n" <<"ID: " << yourPipes[i]._idPipe<< "\nДлина: " << yourPipes[i]._length << "\nДиаметр: " << yourPipes[i]._diameter << "\nВ работе: " << yourPipes[i]._inWork << "\n";
+            cout << "\n\nТруба\n" << "ID: " << yourPipes[i]._idPipe << "\nДлина: " << yourPipes[i]._length << "\nДиаметр: " << yourPipes[i]._diameter << "\nВ работе: " << yourPipes[i]._inWork << "\n";
 }
 
 void edit_pipe(vector<pipe>& yourPipes) {
@@ -175,27 +177,24 @@ void edit_pipe(vector<pipe>& yourPipes) {
         do {
             cout << "Введите число: "; cin >> state_str;
             state = toInt(state_str);
-        } while (!isInt(state_str) || !(state == 1 || state == 2));
+        } while (!(isInt(state_str)) || !(state == 1 || state == 2));
 
         string inWork_str;
+        bool inWork;
+
+        do {
+            cout << "\nВведите новое значение параметра 'В работе': "; cin >> inWork_str;
+            cin.clear();
+            cin.ignore(INT_MAX, '\n');
+            inWork = toBool(inWork_str);
+        } while (!(isBool(inWork_str)));
 
         if (state == 1) {
-            do {
-                cout << "\nВведите новое значение параметра 'В работе': "; cin >> inWork_str;
-                cin.clear();
-                cin.ignore(INT_MAX, '\n');
-                for (int i = 0; i < yourPipes.size(); i++)
-                    if (isBool(inWork_str) == 1 && yourPipes[i]._length != 0) yourPipes[i]._inWork = bool(toInt(inWork_str));
-            } while (isBool(inWork_str) == 0);
+            for (int i = 0; i < yourPipes.size(); i++)
+                if (yourPipes[i]._length != 0) yourPipes[i]._inWork = toBool(inWork_str);
         }
         if (state == 2) {
-            bool inWork;
-            do {
-                cout << "\nВведите новое значение параметра 'В работе': "; cin >> inWork_str;
-                cin.clear();
-                cin.ignore(INT_MAX, '\n');
-                if (isBool(inWork_str) == 1) inWork = bool(toInt(inWork_str));
-            } while (isBool(inWork_str) == 0);
+
             cout << "Вводите ID Труб, параметры которых хотите изменить('.' - окончание цикла)";
 
             string id_str;
@@ -232,7 +231,7 @@ void del_pipe(vector<pipe>& yourPipes) {
             cout << "Введите ID: "; cin >> id_str;
             if (isInt(id_str)) id = toInt(id_str);
         } while (id < 0 || !(is_there_idPipe(yourPipes, id)));
-        yourPipes[id] = {id, 0, 0, 0};
+        yourPipes[id] = { id, 0, 0, 0 };
 
         cout << "\n\nТруба успешно удалена!\n\n";
     }
@@ -248,7 +247,7 @@ void find_pipe(vector<pipe> yourPipes) {
             cout << "Поиск: 1 - по длинне\n2 - по параметру 'В работе'\nВведите число: "; cin >> state_str;
             cin.clear();
             cin.ignore(INT_MAX, '\n');
-            if (isInt(state_str)) state = toInt(state_str);
+            state = toInt(state_str);
         } while (!(isInt(state_str)) || !(toInt(state_str) == 1 || toInt(state_str) == 2));
 
         string parametr_str;
@@ -261,7 +260,7 @@ void find_pipe(vector<pipe> yourPipes) {
                 cout << "Введите длину: "; cin >> parametr_str;
                 cin.clear();
                 cin.ignore(INT_MAX, '\n');
-                if (isFloat(parametr_str)) parametr_first_case = toFloat(parametr_str);
+                parametr_first_case = toFloat(parametr_str);
             } while (!(isFloat(parametr_str)));
 
             for (int i = 0; i < yourPipes.size(); i++) {
@@ -274,22 +273,20 @@ void find_pipe(vector<pipe> yourPipes) {
                 cout << "Введите параметр 'В работе': "; cin >> parametr_str;
                 cin.clear();
                 cin.ignore(INT_MAX, '\n');
-                if (isBool(parametr_str)) parametr_second_case = toInt(parametr_str);
+                parametr_second_case = toBool(parametr_str);
             } while (!(isBool(parametr_str)));
 
             for (int i = 0; i < yourPipes.size(); i++) {
                 if (yourPipes[i]._inWork == parametr_second_case && yourPipes[i]._length != 0) cout << "\n\nТруба\n" << "ID: " << yourPipes[i]._idPipe << "\nДлина: " << yourPipes[i]._length << "\nДиаметр: " << yourPipes[i]._diameter << "\nВ работе: " << yourPipes[i]._inWork << "\n";
             }
             break;
-        default:
-            break;
         }
     }
     else cout << "\nДобавьте трубу\n\n";
 }
 
-void add_CS(vector<CS>& yourCSs, int& id) {
-    
+void add_CS(vector<CS>& yourCSs) {
+
     string nameCS_str;
     string shopCount_str;
     string workShopCount_str;
@@ -309,21 +306,21 @@ void add_CS(vector<CS>& yourCSs, int& id) {
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         shopCount = toInt(shopCount_str);
-    } while (shopCount <= 0);
+    } while (shopCount == 0);
     do {
         cout << "Введите количество цехов в работе (Max: " << shopCount << "): "; cin >> workShopCount_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         workShopCount = toInt(workShopCount_str);
-    } while (shopCount < workShopCount || workShopCount < 0);
+    } while (shopCount < workShopCount || !(isInt(workShopCount_str)));
     do {
         cout << "Введите эффективность: "; cin >> efficiency_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         efficiency = toFloat(efficiency_str);
-    } while (efficiency <= 0);
-    
-    yourCSs.push_back({ new_idCS(yourCSs), nameCS_str, shopCount, workShopCount, efficiency});
+    } while (!(isFloat(efficiency_str)));
+
+    yourCSs.push_back({ new_idCS(yourCSs), nameCS_str, shopCount, workShopCount, efficiency });
 
     /*cout << "Эффективность: " << yourCSs._efficiency;*/
 };
@@ -331,7 +328,7 @@ void add_CS(vector<CS>& yourCSs, int& id) {
 void out_CS(vector<CS> yourCSs) {
     for (int i = 0; i < yourCSs.size(); i++)
         if (!(yourCSs[i]._name.empty()))
-            cout << "\n\nKC\n"<< "ID: " << yourCSs[i]._idCS <<"\nНазвание: " << yourCSs[i]._name << "\nКоличество цехов: " << yourCSs[i]._shopCount << "\nКоличество цехов в работе: " << yourCSs[i]._workShopCount << "\nЭффективность: " << yourCSs[i]._efficiency << "\nПроцент незадействованных цехов: " << yourCSs[i]._prosentBadShop << "\n";
+            cout << "\n\nKC\n" << "ID: " << yourCSs[i]._idCS << "\nНазвание: " << yourCSs[i]._name << "\nКоличество цехов: " << yourCSs[i]._shopCount << "\nКоличество цехов в работе: " << yourCSs[i]._workShopCount << "\nЭффективность: " << yourCSs[i]._efficiency << "\nПроцент незадействованных цехов: " << yourCSs[i]._prosentBadShop << "\n";
 }
 
 void edit_CS(vector<CS>& yourCSs) {
@@ -346,28 +343,28 @@ void edit_CS(vector<CS>& yourCSs) {
             cout << "\nВведите ID: "; cin >> id_str;
             cin.clear();
             cin.ignore(INT_MAX, '\n');
-            if (isInt(id_str)) id = toInt(id_str);
+            id = toInt(id_str);
         } while (!(isInt(id_str)) || !(is_there_idCS(yourCSs, toInt(id_str))));
 
+        string workShopCount_str;
         int workShopCount;
 
         cout << "\nПараметр 'Количество цехов в работе': " << yourCSs[id]._workShopCount;
 
         do {
-            cout << "\nВведите новое значение(Max: " << yourCSs[id]._shopCount << "): ";  cin >> workShopCount;
+            cout << "\nВведите новое значение(Max: " << yourCSs[id]._shopCount << "): ";  cin >> workShopCount_str;
             cin.clear();
             cin.ignore(INT_MAX, '\n');
-        } while (yourCSs[id]._shopCount < workShopCount || workShopCount < 0);
+            workShopCount = toInt(workShopCount_str);
+        } while (yourCSs[id]._shopCount < workShopCount || !(isInt(workShopCount_str)));
 
         yourCSs[id]._workShopCount = workShopCount;
+
         system("cls");
         cout << "\nДанные успешно изменены!\n\n";
         yourCSs[id]._prosentBadShop = (1 - (double(yourCSs[id]._workShopCount) / double(yourCSs[id]._shopCount))) * 100;
     }
-    else
-    {
-        cout << "\nДобавьте KC\n\n";
-    }
+    else cout << "\nДобавьте KC\n\n";
 }
 
 void del_CS(vector<CS>& yourCSs) {
@@ -379,9 +376,11 @@ void del_CS(vector<CS>& yourCSs) {
         out_CS(yourCSs);
         do {
             cout << "Введите ID: "; cin >> id_str;
-            if (isInt(id_str)) id = toInt(id_str);
-        } while (id < 0 || !(is_there_idCS(yourCSs, id)));
-        yourCSs[id] = {id , "", 0, 0, 0, 0};
+            cin.clear();
+            cin.ignore(INT_MAX, '\n');
+            id = toInt(id_str);
+        } while (!(isInt(id_str)) || !(is_there_idCS(yourCSs, id)));
+        yourCSs[id] = { id , "", 0, 0, 0, 0 };
 
         cout << "\n\nКС успешно удалена!\n\n";
     }
@@ -389,6 +388,7 @@ void del_CS(vector<CS>& yourCSs) {
 
 void find_CS(vector<CS> yourCSs) {
     if (count_not_null_CS(yourCSs) != 0) {
+
         string state_str;
         int state;
 
@@ -398,7 +398,7 @@ void find_CS(vector<CS> yourCSs) {
             cin.clear();
             cin.ignore(INT_MAX, '\n');
 
-            if (isInt(state_str)) state = toInt(state_str);
+            state = toInt(state_str);
         } while (!(isInt(state_str)) || !(toInt(state_str) == 1 || toInt(state_str) == 2));
 
         string parametr_str;
@@ -410,7 +410,7 @@ void find_CS(vector<CS> yourCSs) {
             getline(cin, parametr_str, '\n');
             /*cout << parametr_str << endl;*/
             for (int i = 0; i < yourCSs.size(); i++) {
-                cout <<'"'<< (yourCSs[i]._name)<<'"' << endl;
+                cout << '"' << (yourCSs[i]._name) << '"' << endl;
                 if (yourCSs[i]._name == parametr_str && !(yourCSs[i]._name.empty())) cout << "\n\nKC\n" << "ID: " << yourCSs[i]._idCS << "\nНазвание: " << yourCSs[i]._name << "\nКоличество цехов: " << yourCSs[i]._shopCount << "\nКоличество цехов в работе: " << yourCSs[i]._workShopCount << "\nЭффективность: " << yourCSs[i]._efficiency << "\nПроцент незадействованных цехов: " << yourCSs[i]._prosentBadShop << "\n";
             }
             break;
@@ -420,14 +420,12 @@ void find_CS(vector<CS> yourCSs) {
                 cout << "Введите процент незадействованных цехов: "; cin >> parametr_str;
                 cin.clear();
                 cin.ignore(INT_MAX, '\n');
-                if (isFloat(parametr_str)) parametr = toFloat(parametr_str);
+                parametr = toFloat(parametr_str);
             } while (!(isFloat(parametr_str)));
 
             for (int i = 0; i < yourCSs.size(); i++) {
                 if (yourCSs[i]._prosentBadShop >= parametr && !(yourCSs[i]._name.empty())) cout << "\n\nKC\n" << "ID: " << yourCSs[i]._idCS << "\nНазвание: " << yourCSs[i]._name << "\nКоличество цехов: " << yourCSs[i]._shopCount << "\nКоличество цехов в работе: " << yourCSs[i]._workShopCount << "\nЭффективность: " << yourCSs[i]._efficiency << "\nПроцент незадействованных цехов: " << yourCSs[i]._prosentBadShop << "\n";
             }
-            break;
-        default:
             break;
         }
     }
@@ -457,7 +455,7 @@ void out_all_to_file(vector<pipe> yourPipes, vector<CS> yourCSs) {
 }
 
 void in_all_at_file(vector<pipe>& yourPipes, vector<CS>& yourCSs) {
-    
+
     string fileName_str;
     cout << "Введите название файла: "; cin >> fileName_str;
 
@@ -474,7 +472,7 @@ void in_all_at_file(vector<pipe>& yourPipes, vector<CS>& yourCSs) {
         float length;
         float diameter;
         bool inWork;
-        
+
         string name;
         int shopCount;
         int workShopCount;
@@ -501,10 +499,10 @@ void in_all_at_file(vector<pipe>& yourPipes, vector<CS>& yourCSs) {
             getline(fin, str, '\n');
             inWork = bool(str.c_str());
 
-            yourPipes.push_back({id, length , diameter , inWork });
+            yourPipes.push_back({ id, length , diameter , inWork });
         }
         out_pipe(yourPipes);
-        
+
         for (int i = 0; i < toInt(count_CS); i++) {
 
             getline(fin, str, '\n');
@@ -526,7 +524,7 @@ void in_all_at_file(vector<pipe>& yourPipes, vector<CS>& yourCSs) {
             yourCSs.push_back({ id, name , shopCount , workShopCount , efficiency , prosentBadShop });
         }
         out_CS(yourCSs);
-        
+
         fin.close();
     }
     else cout << "Не удалось найти файл\n";
@@ -534,8 +532,6 @@ void in_all_at_file(vector<pipe>& yourPipes, vector<CS>& yourCSs) {
 
 int main()
 {
-    int idPipe = -1;
-    int idCS = -1;
     vector<pipe> yourPipes;
     vector<CS> yourCSs;
 
@@ -547,11 +543,11 @@ int main()
         add_stateMenu(stateMenu);
         switch (stateMenu) {
         case 1:
-            add_pipe(yourPipes, idPipe);
+            add_pipe(yourPipes);
             menu();
             break;
         case 2:
-            add_CS(yourCSs, idCS);
+            add_CS(yourCSs);
             menu();
             break;
         case 3:
