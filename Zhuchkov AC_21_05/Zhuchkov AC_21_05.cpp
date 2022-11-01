@@ -1,25 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 using namespace std;
-
-struct pipe {
-    int _idPipe;
-    float _length;
-    float _diameter;
-    bool _inWork;
-};
-
-struct CS {
-    int _idCS;
-    string _name;
-    int _shopCount;
-    int _workShopCount;
-    double _efficiency;
-    double _prosentBadShop = (1 - (double(_workShopCount) / double(_shopCount))) * 100;
-};
 
 bool isInt(string str) {
     bool err = false;
@@ -76,6 +60,7 @@ bool toBool(string str) {
     return 0;
 }
 
+
 void menu() {
     system("pause");
     system("cls");
@@ -93,42 +78,52 @@ void add_stateMenu(int& stateMenu) {
     isInt(stateMenu_str) ? stateMenu = toInt(stateMenu_str) : stateMenu = -1;
 }
 
-int count_not_null_pipe(vector<pipe> yourPipes) {
-    int count = 0;
-    for (int i = 0; i < yourPipes.size(); i++)
-        if (yourPipes[i]._length != 0) count += 1;
-    return count;
+class Pipe
+{
+private:
+    int _idPipe;
+    float _length;
+    float _diameter;
+
+public:
+
+    bool _inWork;
+
+    int get_idPipe() {return _idPipe;};
+    float get_length() {return _length;};
+    float get_diameter() {return _diameter;};
+    bool get_inWork() {return _inWork;};
+
+    void add_pipe_inner(int __idPipe, float __length, float __diameter, bool __inWork);
+
+    void out_pipe_inner();
+};
+
+void Pipe::add_pipe_inner(int __idPipe, float __length, float __diameter, bool __inWork) {
+    _idPipe = __idPipe;
+    _length = __length;
+    _diameter = __diameter;
+    _inWork = __inWork;
 }
 
-int count_not_null_CS(vector<CS> yourCSs) {
-    int count = 0;
-    for (int i = 0; i < yourCSs.size(); i++)
-        if (!(yourCSs[i]._name.empty())) count += 1;
-    return count;
-}
+void Pipe::out_pipe_inner(){
+    cout << "\n\nТруба\n" << "ID: " << _idPipe << "\nДлина: " << _length << "\nДиаметр: " << _diameter << "\nВ работе: " << _inWork << "\n";
+};
 
-int new_idPipe(vector<pipe> yourPipes) {
-    return yourPipes.size();
-}
-
-int new_idCS(vector<CS> yourCSs) {
-    return yourCSs.size();
-}
-
-bool is_there_idPipe(vector<pipe> yourPipes, int id) {
-    for (int i = 0; i < yourPipes.size(); i++)
-        if (yourPipes[i]._idPipe == id && yourPipes[i]._length != 0) return true;
+bool is_there_idPipe(unordered_map<int, Pipe> yourPipes, int id, int size_) {
+    for (int i = 0; i < size_; i++)
+        if (yourPipes[i].get_idPipe() == id && yourPipes[i].get_length() != 0) return true;
     return false;
 }
 
-bool is_there_idCS(vector<CS> yourCSs, int id) {
-    for (int i = 0; i < yourCSs.size(); i++)
-        if (yourCSs[i]._idCS == id && (!(yourCSs[i]._name.empty()))) return true;
-    return false;
+int count_not_null_pipe(unordered_map<int, Pipe> yourPipes,int size_) {
+    int count = 0;
+    for (int i = 0; i < size_; i++)
+        if (yourPipes[i].get_length() != 0) count += 1;
+    return count;
 }
 
-void add_pipe(vector<pipe>& yourPipes) {
-
+void add_pipe(unordered_map<int, Pipe>& yourPipes, int& size_){
     string length_str;
     string diameter_str;
     string inWork_str;
@@ -138,36 +133,40 @@ void add_pipe(vector<pipe>& yourPipes) {
     bool inWork = false;
 
     do {
-        cout << "Введите длину трубы: "; cin >> length_str;
+        cout << "Введите длину трубы: ";
+        cin >> length_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         length = toFloat(length_str);
     } while (length == 0);
     do {
-        cout << "Введите диаметр трубы: "; cin >> diameter_str;
+        cout << "Введите диаметр трубы: ";
+        cin >> diameter_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         diameter = toFloat(diameter_str);
     } while (diameter == 0);
     do {
-        cout << "В работе(1/0): "; cin >> inWork_str;
+        cout << "В работе(1/0): ";
+        cin >> inWork_str;
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         inWork = toBool(inWork_str);
     } while (!(isBool(inWork_str)));
 
-    yourPipes.push_back({ new_idPipe(yourPipes), length, diameter, inWork });
-};
-
-void out_pipe(vector<pipe> yourPipes) {
-    for (int i = 0; i < yourPipes.size(); i++)
-        if (yourPipes[i]._length != 0)
-            cout << "\n\nТруба\n" << "ID: " << yourPipes[i]._idPipe << "\nДлина: " << yourPipes[i]._length << "\nДиаметр: " << yourPipes[i]._diameter << "\nВ работе: " << yourPipes[i]._inWork << "\n";
+    yourPipes[size_].add_pipe_inner(size_, length, diameter, inWork);
+    size_++;
 }
 
-void edit_pipe(vector<pipe>& yourPipes) {
+void out_pipe(unordered_map<int, Pipe> yourPipes, int size_){
+    for (int i = 0; i < size_; i++){
+        if (yourPipes[i].get_length() != 0) yourPipes[i].out_pipe_inner();
+    }
+}
 
-    if (count_not_null_pipe(yourPipes) != 0) {
+void edit_pipe(unordered_map<int, Pipe>& yourPipes, int size_) {
+
+    if (count_not_null_pipe(yourPipes, size_) != 0) {
 
         string state_str;
         int state = -1;
@@ -190,8 +189,8 @@ void edit_pipe(vector<pipe>& yourPipes) {
         } while (!(isBool(inWork_str)));
 
         if (state == 1) {
-            for (int i = 0; i < yourPipes.size(); i++)
-                if (yourPipes[i]._length != 0) yourPipes[i]._inWork = toBool(inWork_str);
+            for (int i = 0; i < size_; i++)
+                if (yourPipes[i].get_length() != 0) yourPipes[i]._inWork = toBool(inWork_str);
         }
         if (state == 2) {
 
@@ -203,9 +202,9 @@ void edit_pipe(vector<pipe>& yourPipes) {
                 cout << "\nВведите ID: "; cin >> id_str;
                 cin.clear();
                 cin.ignore(INT_MAX, '\n');
-                if (isInt(id_str) && is_there_idPipe(yourPipes, toInt(id_str)))
+                if (isInt(id_str) && is_there_idPipe(yourPipes, toInt(id_str), size_))
                     for (int i = 0; i < yourPipes.size(); i++) {
-                        if (yourPipes[i]._idPipe == toInt(id_str) && yourPipes[i]._length != 0) {
+                        if (yourPipes[i].get_idPipe() == toInt(id_str) && yourPipes[i].get_length() != 0) {
                             yourPipes[i]._inWork = inWork;
                             cout << "Успешно";
                             break;
@@ -220,25 +219,8 @@ void edit_pipe(vector<pipe>& yourPipes) {
     else cout << "\nДобавьте трубу\n\n";
 }
 
-void del_pipe(vector<pipe>& yourPipes) {
-    if (count_not_null_pipe(yourPipes) == 0) cout << "\nДобавьте трубу\n\n";
-    else {
-        string id_str;
-        int id = -1;
-
-        out_pipe(yourPipes);
-        do {
-            cout << "Введите ID: "; cin >> id_str;
-            if (isInt(id_str)) id = toInt(id_str);
-        } while (id < 0 || !(is_there_idPipe(yourPipes, id)));
-        yourPipes[id] = { id, 0, 0, 0 };
-
-        cout << "\n\nТруба успешно удалена!\n\n";
-    }
-}
-
-void find_pipe(vector<pipe> yourPipes) {
-    if (count_not_null_pipe(yourPipes) != 0) {
+void find_pipe(unordered_map<int, Pipe> yourPipes, int size_) {
+    if (count_not_null_pipe(yourPipes, size_) != 0) {
 
         string state_str;
         int state;
@@ -254,38 +236,103 @@ void find_pipe(vector<pipe> yourPipes) {
 
         switch (state)
         {
-        case 1:
-            float parametr_first_case;
-            do {
-                cout << "Введите длину: "; cin >> parametr_str;
-                cin.clear();
-                cin.ignore(INT_MAX, '\n');
-                parametr_first_case = toFloat(parametr_str);
-            } while (!(isFloat(parametr_str)));
+            case 1:
+                float parametr_first_case;
+                do {
+                    cout << "Введите длину: "; cin >> parametr_str;
+                    cin.clear();
+                    cin.ignore(INT_MAX, '\n');
+                    parametr_first_case = toFloat(parametr_str);
+                } while (!(isFloat(parametr_str)));
 
-            for (int i = 0; i < yourPipes.size(); i++) {
-                if (yourPipes[i]._length >= parametr_first_case && yourPipes[i]._length != 0) cout << "\n\nТруба\n" << "ID: " << yourPipes[i]._idPipe << "\nДлина: " << yourPipes[i]._length << "\nДиаметр: " << yourPipes[i]._diameter << "\nВ работе: " << yourPipes[i]._inWork << "\n";
-            }
-            break;
-        case 2:
-            bool parametr_second_case;
-            do {
-                cout << "Введите параметр 'В работе': "; cin >> parametr_str;
-                cin.clear();
-                cin.ignore(INT_MAX, '\n');
-                parametr_second_case = toBool(parametr_str);
-            } while (!(isBool(parametr_str)));
+                for (int i = 0; i < yourPipes.size(); i++) {
+                    if (yourPipes[i].get_length() >= parametr_first_case && yourPipes[i].get_length() != 0) cout << "\n\nТруба\n" << "ID: " << yourPipes[i].get_idPipe() << "\nДлина: " << yourPipes[i].get_length() << "\nДиаметр: " << yourPipes[i].get_diameter() << "\nВ работе: " << yourPipes[i]._inWork << "\n";
+                }
+                break;
+            case 2:
+                bool parametr_second_case;
+                do {
+                    cout << "Введите параметр 'В работе': "; cin >> parametr_str;
+                    cin.clear();
+                    cin.ignore(INT_MAX, '\n');
+                    parametr_second_case = toBool(parametr_str);
+                } while (!(isBool(parametr_str)));
 
-            for (int i = 0; i < yourPipes.size(); i++) {
-                if (yourPipes[i]._inWork == parametr_second_case && yourPipes[i]._length != 0) cout << "\n\nТруба\n" << "ID: " << yourPipes[i]._idPipe << "\nДлина: " << yourPipes[i]._length << "\nДиаметр: " << yourPipes[i]._diameter << "\nВ работе: " << yourPipes[i]._inWork << "\n";
-            }
-            break;
+                for (int i = 0; i < yourPipes.size(); i++) {
+                    if (yourPipes[i]._inWork == parametr_second_case && yourPipes[i].get_length() != 0) cout << "\n\nТруба\n" << "ID: " << yourPipes[i].get_idPipe() << "\nДлина: " << yourPipes[i].get_length() << "\nДиаметр: " << yourPipes[i].get_diameter() << "\nВ работе: " << yourPipes[i]._inWork << "\n";
+                }
+                break;
         }
     }
     else cout << "\nДобавьте трубу\n\n";
 }
 
-void add_CS(vector<CS>& yourCSs) {
+void del_pipe(unordered_map<int, Pipe>& yourPipes, int size_) {
+    if (count_not_null_pipe(yourPipes, size_) == 0) cout << "\nДобавьте трубу\n\n";
+    else {
+        string id_str;
+        int id = -1;
+
+        out_pipe(yourPipes,size_);
+        do {
+            cout << "Введите ID: "; cin >> id_str;
+            if (isInt(id_str)) id = toInt(id_str);
+        } while (id < 0 || !(is_there_idPipe(yourPipes, id,size_)));
+        yourPipes.erase(id);
+
+        cout << "\n\nТруба успешно удалена!\n\n";
+    }
+}
+
+class CS {
+private:
+    int _idCS;
+    string _name;
+    int _shopCount;
+    double _efficiency;
+    double _prosentBadShop = (1 - (double(_workShopCount) / double(_shopCount))) * 100;
+public:
+    int _workShopCount;
+
+    int get_idCS() {return _idCS;};
+    string get_name() {return _name;};
+    int get_shopCount() {return _shopCount;};
+    double get_efficiency() {return _efficiency;};
+    double get_prosentBadShop() {return _prosentBadShop;};
+
+    void prosentBadShop_add(double prosent) {_prosentBadShop = prosent;};
+
+    void add_CS_inner(int __idCS, string __name, int __shopCount, int __workShopCount, double __efficiency);
+
+    void out_CS_inner();
+};
+
+void CS::add_CS_inner(int __idCS, string __name, int __shopCount, int __workShopCount, double __efficiency) {
+    _idCS = __idCS;
+    _name = __name;
+    _shopCount = __shopCount;
+    _workShopCount = __workShopCount;
+    _efficiency = __efficiency;
+}
+
+void CS::out_CS_inner(){
+    cout << "\n\nKC\n" << "ID: " << _idCS << "\nНазвание: " << _name << "\nКоличество цехов: " << _shopCount << "\nКоличество цехов в работе: " << _workShopCount << "\nЭффективность: " << _efficiency << "\nПроцент незадействованных цехов: " << _prosentBadShop << "\n";
+};
+
+bool is_there_idCS(unordered_map<int, CS> yourCSs, int id, int size_) {
+    for (int i = 0; i < size_; i++)
+        if (yourCSs[i].get_idCS() == id && (!(yourCSs[i].get_name().empty()))) return true;
+    return false;
+}
+
+int count_not_null_CS(unordered_map<int, CS> yourCSs, int size_) {
+    int count = 0;
+    for (int i = 0; i < size_; i++)
+        if (!(yourCSs[i].get_name().empty())) count += 1;
+    return count;
+}
+
+void add_CS(unordered_map<int, CS>& yourCSs, int& size_) {
 
     string nameCS_str;
     string shopCount_str;
@@ -320,31 +367,31 @@ void add_CS(vector<CS>& yourCSs) {
         efficiency = toFloat(efficiency_str);
     } while (!(isFloat(efficiency_str)));
 
-    yourCSs.push_back({ new_idCS(yourCSs), nameCS_str, shopCount, workShopCount, efficiency });
-
+    yourCSs[size_].add_CS_inner(size_, nameCS_str, shopCount, workShopCount, efficiency);
+    size_++;
     /*cout << "Эффективность: " << yourCSs._efficiency;*/
 };
 
-void out_CS(vector<CS> yourCSs) {
-    for (int i = 0; i < yourCSs.size(); i++)
-        if (!(yourCSs[i]._name.empty()))
-            cout << "\n\nKC\n" << "ID: " << yourCSs[i]._idCS << "\nНазвание: " << yourCSs[i]._name << "\nКоличество цехов: " << yourCSs[i]._shopCount << "\nКоличество цехов в работе: " << yourCSs[i]._workShopCount << "\nЭффективность: " << yourCSs[i]._efficiency << "\nПроцент незадействованных цехов: " << yourCSs[i]._prosentBadShop << "\n";
+void out_CS(unordered_map<int, CS> yourCSs, int size_) {
+    for (int i = 0; i < size_; i++)
+        if (!(yourCSs[i].get_name().empty()))
+            cout << "\n\nKC\n" << "ID: " << yourCSs[i].get_idCS() << "\nНазвание: " << yourCSs[i].get_name() << "\nКоличество цехов: " << yourCSs[i].get_shopCount() << "\nКоличество цехов в работе: " << yourCSs[i]._workShopCount << "\nЭффективность: " << yourCSs[i].get_efficiency() << "\nПроцент незадействованных цехов: " << yourCSs[i].get_prosentBadShop() << "\n";
 }
 
-void edit_CS(vector<CS>& yourCSs) {
-    if (count_not_null_CS(yourCSs) != 0) {
+void edit_CS(unordered_map<int, CS>& yourCSs, int size_) {
+    if (count_not_null_CS(yourCSs, size_) != 0) {
 
         string id_str;
         int id = -1;
 
-        out_CS(yourCSs);
+        out_CS(yourCSs,size_);
 
         do {
             cout << "\nВведите ID: "; cin >> id_str;
             cin.clear();
             cin.ignore(INT_MAX, '\n');
             id = toInt(id_str);
-        } while (!(isInt(id_str)) || !(is_there_idCS(yourCSs, toInt(id_str))));
+        } while (!(isInt(id_str)) || !(is_there_idCS(yourCSs, toInt(id_str), size_)));
 
         string workShopCount_str;
         int workShopCount;
@@ -352,42 +399,42 @@ void edit_CS(vector<CS>& yourCSs) {
         cout << "\nПараметр 'Количество цехов в работе': " << yourCSs[id]._workShopCount;
 
         do {
-            cout << "\nВведите новое значение(Max: " << yourCSs[id]._shopCount << "): ";  cin >> workShopCount_str;
+            cout << "\nВведите новое значение(Max: " << yourCSs[id].get_shopCount() << "): ";  cin >> workShopCount_str;
             cin.clear();
             cin.ignore(INT_MAX, '\n');
             workShopCount = toInt(workShopCount_str);
-        } while (yourCSs[id]._shopCount < workShopCount || !(isInt(workShopCount_str)));
+        } while (yourCSs[id].get_shopCount() < workShopCount || !(isInt(workShopCount_str)));
 
         yourCSs[id]._workShopCount = workShopCount;
 
         system("cls");
         cout << "\nДанные успешно изменены!\n\n";
-        yourCSs[id]._prosentBadShop = (1 - (double(yourCSs[id]._workShopCount) / double(yourCSs[id]._shopCount))) * 100;
+        yourCSs[id].prosentBadShop_add((1 - (double(yourCSs[id]._workShopCount) / double(yourCSs[id].get_shopCount()))) * 100);
     }
     else cout << "\nДобавьте KC\n\n";
 }
 
-void del_CS(vector<CS>& yourCSs) {
-    if (count_not_null_CS(yourCSs) == 0) cout << "\nДобавьте КС\n\n";
+void del_CS(unordered_map<int, CS>& yourCSs, int size_) {
+    if (count_not_null_CS(yourCSs, size_) == 0) cout << "\nДобавьте КС\n\n";
     else {
         string id_str;
         int id = -1;
 
-        out_CS(yourCSs);
+        out_CS(yourCSs, size_);
         do {
             cout << "Введите ID: "; cin >> id_str;
             cin.clear();
             cin.ignore(INT_MAX, '\n');
             id = toInt(id_str);
-        } while (!(isInt(id_str)) || !(is_there_idCS(yourCSs, id)));
-        yourCSs[id] = { id , "", 0, 0, 0, 0 };
+        } while (!(isInt(id_str)) || !(is_there_idCS(yourCSs, id,size_)));
+        yourCSs.erase(id);
 
         cout << "\n\nКС успешно удалена!\n\n";
     }
 }
 
-void find_CS(vector<CS> yourCSs) {
-    if (count_not_null_CS(yourCSs) != 0) {
+void find_CS(unordered_map<int, CS> yourCSs, int size_) {
+    if (count_not_null_CS(yourCSs, size_) != 0) {
 
         string state_str;
         int state;
@@ -405,35 +452,35 @@ void find_CS(vector<CS> yourCSs) {
 
         switch (state)
         {
-        case 1:
-            cout << "Введите название: ";
-            getline(cin, parametr_str, '\n');
-            /*cout << parametr_str << endl;*/
-            for (int i = 0; i < yourCSs.size(); i++) {
-                cout << '"' << (yourCSs[i]._name) << '"' << endl;
-                if (yourCSs[i]._name == parametr_str && !(yourCSs[i]._name.empty())) cout << "\n\nKC\n" << "ID: " << yourCSs[i]._idCS << "\nНазвание: " << yourCSs[i]._name << "\nКоличество цехов: " << yourCSs[i]._shopCount << "\nКоличество цехов в работе: " << yourCSs[i]._workShopCount << "\nЭффективность: " << yourCSs[i]._efficiency << "\nПроцент незадействованных цехов: " << yourCSs[i]._prosentBadShop << "\n";
-            }
-            break;
-        case 2:
-            float parametr;
-            do {
-                cout << "Введите процент незадействованных цехов: "; cin >> parametr_str;
-                cin.clear();
-                cin.ignore(INT_MAX, '\n');
-                parametr = toFloat(parametr_str);
-            } while (!(isFloat(parametr_str)));
+            case 1:
+                cout << "Введите название: ";
+                getline(cin, parametr_str, '\n');
+                /*cout << parametr_str << endl;*/
+                for (int i = 0; i < size_; i++) {
+                    cout << '"' << (yourCSs[i].get_name()) << '"' << endl;
+                    if (yourCSs[i].get_name() == parametr_str && !(yourCSs[i].get_name().empty())) cout << "\n\nKC\n" << "ID: " << yourCSs[i].get_idCS() << "\nНазвание: " << yourCSs[i].get_name() << "\nКоличество цехов: " << yourCSs[i].get_shopCount() << "\nКоличество цехов в работе: " << yourCSs[i]._workShopCount << "\nЭффективность: " << yourCSs[i].get_efficiency() << "\nПроцент незадействованных цехов: " << yourCSs[i].get_prosentBadShop() << "\n";
+                }
+                break;
+            case 2:
+                float parametr;
+                do {
+                    cout << "Введите процент незадействованных цехов: "; cin >> parametr_str;
+                    cin.clear();
+                    cin.ignore(INT_MAX, '\n');
+                    parametr = toFloat(parametr_str);
+                } while (!(isFloat(parametr_str)));
 
-            for (int i = 0; i < yourCSs.size(); i++) {
-                if (yourCSs[i]._prosentBadShop >= parametr && !(yourCSs[i]._name.empty())) cout << "\n\nKC\n" << "ID: " << yourCSs[i]._idCS << "\nНазвание: " << yourCSs[i]._name << "\nКоличество цехов: " << yourCSs[i]._shopCount << "\nКоличество цехов в работе: " << yourCSs[i]._workShopCount << "\nЭффективность: " << yourCSs[i]._efficiency << "\nПроцент незадействованных цехов: " << yourCSs[i]._prosentBadShop << "\n";
-            }
-            break;
+                for (int i = 0; i < size_; i++) {
+                    if (yourCSs[i].get_prosentBadShop() >= parametr && !(yourCSs[i].get_name().empty())) cout << "\n\nKC\n" << "ID: " << yourCSs[i].get_idCS() << "\nНазвание: " << yourCSs[i].get_name() << "\nКоличество цехов: " << yourCSs[i].get_shopCount() << "\nКоличество цехов в работе: " << yourCSs[i]._workShopCount << "\nЭффективность: " << yourCSs[i].get_efficiency() << "\nПроцент незадействованных цехов: " << yourCSs[i].get_prosentBadShop() << "\n";
+                }
+                break;
         }
     }
     else cout << "\nДобавьте КС\n\n";
 }
 
-void out_all_to_file(vector<pipe> yourPipes, vector<CS> yourCSs) {
-    if (count_not_null_pipe(yourPipes) == 0 && count_not_null_CS(yourCSs) == 0) cout << "\nДобавьте Трубу или КС\n\n";
+void out_all_to_file(unordered_map<int, Pipe> yourPipes,int size_p, unordered_map<int, CS> yourCSs, int size_c) {
+    if (count_not_null_pipe(yourPipes, size_p) == 0 && count_not_null_CS(yourCSs,size_c) == 0) cout << "\nДобавьте Трубу или КС\n\n";
     else {
         string fileName_str;
 
@@ -441,20 +488,20 @@ void out_all_to_file(vector<pipe> yourPipes, vector<CS> yourCSs) {
 
         ofstream fout(fileName_str + ".txt");
 
-        fout << yourPipes.size() << "\n" << yourCSs.size() << "\n";
+        fout << size_p << "\n" << size_c << "\n";
 
-        for (int i = 0; i < yourPipes.size(); i++) {
-            fout << yourPipes[i]._idPipe << "\n" << yourPipes[i]._length << "\n" << yourPipes[i]._diameter << "\n" << yourPipes[i]._inWork << "\n";
+        for (int i = 0; i < size_p; i++) {
+            fout << yourPipes[i].get_idPipe() << "\n" << yourPipes[i].get_length() << "\n" << yourPipes[i].get_diameter() << "\n" << yourPipes[i]._inWork << "\n";
         }
-        for (int i = 0; i < yourCSs.size(); i++) {
-            fout << yourCSs[i]._idCS << "\n" << yourCSs[i]._name << "\n" << yourCSs[i]._shopCount << "\n" << yourCSs[i]._workShopCount << "\n" << yourCSs[i]._efficiency << "\n";
+        for (int i = 0; i < size_c; i++) {
+            fout << yourCSs[i].get_idCS() << "\n" << yourCSs[i].get_name() << "\n" << yourCSs[i].get_shopCount() << "\n" << yourCSs[i]._workShopCount << "\n" << yourCSs[i].get_efficiency() << "\n";
         }
 
         fout.close();
     }
 }
 
-void in_all_at_file(vector<pipe>& yourPipes, vector<CS>& yourCSs) {
+void in_all_at_file(unordered_map<int, Pipe>& yourPipes,int& size_p, unordered_map<int, CS>& yourCSs, int& size_c) {
 
     string fileName_str;
     cout << "Введите название файла: "; cin >> fileName_str;
@@ -499,9 +546,10 @@ void in_all_at_file(vector<pipe>& yourPipes, vector<CS>& yourCSs) {
             getline(fin, str, '\n');
             inWork = bool(str.c_str());
 
-            yourPipes.push_back({ id, length , diameter , inWork });
+            yourPipes[id].add_pipe_inner( id, length , diameter , inWork );
+            size_p = id++;
         }
-        out_pipe(yourPipes);
+        out_pipe(yourPipes, size_p);
 
         for (int i = 0; i < toInt(count_CS); i++) {
 
@@ -521,75 +569,76 @@ void in_all_at_file(vector<pipe>& yourPipes, vector<CS>& yourCSs) {
 
             prosentBadShop = (1 - (double(workShopCount) / double(shopCount))) * 100;
 
-            yourCSs.push_back({ id, name , shopCount , workShopCount , efficiency , prosentBadShop });
+            yourCSs[id].add_CS_inner(id, name , shopCount , workShopCount , efficiency);
+            size_c = id++;
         }
-        out_CS(yourCSs);
+        out_CS(yourCSs,size_c);
 
         fin.close();
     }
     else cout << "Не удалось найти файл\n";
 }
 
-int main()
-{
-    vector<pipe> yourPipes;
-    vector<CS> yourCSs;
-
+int main(){
+    int size_p = 0;
+    int size_c = 0;
+    unordered_map<int, Pipe> yourPipes;
+    unordered_map<int, CS> yourCSs;
     int stateMenu = -1;
+
     setlocale(LC_ALL, "");
     menu();
+
     while (stateMenu)
     {
         add_stateMenu(stateMenu);
         switch (stateMenu) {
-        case 1:
-            add_pipe(yourPipes);
-            menu();
-            break;
-        case 2:
-            add_CS(yourCSs);
-            menu();
-            break;
-        case 3:
-            out_pipe(yourPipes);
-            out_CS(yourCSs);
-            menu();
-            break;
-        case 4:
-            edit_pipe(yourPipes);
-            menu();
-            break;
-        case 5:
-            edit_CS(yourCSs);
-            menu();
-            break;
-        case 6:
-            out_all_to_file(yourPipes, yourCSs);
-            menu();
-            break;
-        case 7:
-            in_all_at_file(yourPipes, yourCSs);
-            menu();
-            break;
-        case 8:
-            find_pipe(yourPipes);
-            menu();
-            break;
-        case 9:
-            find_CS(yourCSs);
-            menu();
-            break;
-        case 10:
-            del_pipe(yourPipes);
-            menu();
-            break;
-        case 11:
-            del_CS(yourCSs);
-            menu();
-            break;
-        default:
-            menu();
-            break;
-        }
-    }
-}
+            case 1:
+                add_pipe(yourPipes, size_p);
+                menu();
+                break;
+            case 2:
+                add_CS(yourCSs, size_c);
+                menu();
+                break;
+            case 3:
+                out_pipe(yourPipes, size_p);
+                out_CS(yourCSs, size_c);
+                menu();
+                break;
+            case 4:
+                edit_pipe(yourPipes, size_p);
+                menu();
+                break;
+            case 5:
+                edit_CS(yourCSs, size_c);
+                menu();
+                break;
+            case 6:
+                out_all_to_file(yourPipes, size_p, yourCSs, size_c);
+                menu();
+                break;
+            case 7:
+                in_all_at_file(yourPipes, size_p, yourCSs, size_c);
+                menu();
+                break;
+            case 8:
+                find_pipe(yourPipes, size_p);
+                menu();
+                break;
+            case 9:
+                find_CS(yourCSs, size_c);
+                menu();
+                break;
+            case 10:
+                del_pipe(yourPipes, size_p);
+                menu();
+                break;
+            case 11:
+                del_CS(yourCSs, size_c);
+                menu();
+                break;
+            default:
+                menu();
+                break;
+        }}}
