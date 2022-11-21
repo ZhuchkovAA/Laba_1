@@ -139,9 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CS.cpp" />
+    <ClCompile Include="pipe.cpp" />
     <ClCompile Include="Zhuchkov AC_21_05.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CS.h" />
+    <ClInclude Include="func_pipe.h" />
+    <ClInclude Include="func_CS.h" />
+    <ClInclude Include="pipe.h" />
     <ClInclude Include="Zhuchkov AC_21_05.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
